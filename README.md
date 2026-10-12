@@ -1,8 +1,7 @@
 # ENERSINC Harness
 
 <p align="center">
-  <img src="branding/enersinc-logo.svg" alt="ENERSINC" width="200" style="vertical-align: middle; margin-right: 20px;">
-  <img src="https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/main/docs/public/logo.svg" alt="DeepSeek Harness" width="180" style="vertical-align: middle;">
+  <img src="branding/enersinc-logo.svg" alt="ENERSINC" width="280">
 </p>
 
 **El asistente de IA especializado en regulación energética colombiana (CREG)** para el equipo de ENERSINC. Basado en DeepSeek Harness, congelado y extendido con marca corporativa y capacidad CREG nativa.
