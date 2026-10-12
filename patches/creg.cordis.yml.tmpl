@@ -1,0 +1,26 @@
+# Overlay MCP del CREG (alternativa al plugin nativo) para ENERSINC Harness.
+#
+# `scripts/setup.sh` reemplaza __ENERSINC_HARNESS__ por la ruta real y genera
+# `patches/creg.cordis.yml`. Monta el puente MCP `@enersinc/mcp-creg` como tools
+# `mcp__creg__*` y publica el directorio de skills.
+#
+# `toolCallTimeoutMs` es alto porque `ask` puede tardar hasta 180 s.
+
+- insert:
+    - id: mcp-creg
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: creg
+        transport: stdio
+        command: node
+        args:
+          - '__ENERSINC_HARNESS__/packages/mcp-creg/src/server.mjs'
+        env:
+          CREG_URL: !!js "process.env.CREG_URL ?? 'http://127.0.0.1:3100'"
+        toolCallTimeoutMs: 300000
+        failOnStartupError: false
+
+- id: skill-filesystem
+  config:
+    customSkillDirs:
+      - '__ENERSINC_HARNESS__/skills'

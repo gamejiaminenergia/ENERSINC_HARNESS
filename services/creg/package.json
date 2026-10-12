@@ -1,0 +1,17 @@
+{
+  "name": "creg-client",
+  "version": "1.0.0",
+  "description": "Cliente CREG Colombia",
+  "main": "creg-client.js",
+  "scripts": {
+    "ask": "node creg-client.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "playwright": "^1.59.1"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
+  }
+}

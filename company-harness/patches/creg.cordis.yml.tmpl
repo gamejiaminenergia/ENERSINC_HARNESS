@@ -1,0 +1,28 @@
+# Overlay del CREG (plantilla) para DeepSeek Harness.
+#
+# `scripts/install.sh` reemplaza __COMPANY_HARNESS__ por la ruta real de este
+# checkout y genera `patches/creg.cordis.yml`.
+#
+# Monta el servidor MCP `@company/mcp-creg` como tools nativas `mcp__creg__*`,
+# mas el directorio de skills del equipo.
+#
+# `toolCallTimeoutMs` es alto porque `ask` puede tardar hasta 180 s.
+
+- insert:
+    - id: mcp-creg
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: creg
+        transport: stdio
+        command: node
+        args:
+          - '__COMPANY_HARNESS__/packages/mcp-creg/src/server.mjs'
+        env:
+          CREG_URL: !!js "process.env.CREG_URL ?? 'http://127.0.0.1:3100'"
+        toolCallTimeoutMs: 300000
+        failOnStartupError: false
+
+- id: skill-filesystem
+  config:
+    customSkillDirs:
+      - '__COMPANY_HARNESS__/skills'

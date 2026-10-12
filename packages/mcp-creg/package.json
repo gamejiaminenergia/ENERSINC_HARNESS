@@ -1,0 +1,17 @@
+{
+  "name": "@enersinc/mcp-creg",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Servidor MCP (stdio) que expone el cliente CREG (regulacion energetica colombiana) como herramientas para DeepSeek Harness.",
+  "bin": {
+    "mcp-creg": "src/server.mjs"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.31.0",
+    "zod": "4.4.3"
+  }
+}

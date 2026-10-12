@@ -1,0 +1,9 @@
+node_modules/
+lib/
+dist/
+*.log
+.env
+.DS_Store
+
+# Overlays generados desde las plantillas .tmpl (llevan rutas absolutas)
+patches/creg.cordis.yml

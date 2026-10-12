@@ -1,0 +1,17 @@
+node_modules/
+vendor/
+.env
+*.log
+*.tsbuildinfo
+
+# Servicio CREG
+services/creg/responses/
+services/creg/node_modules/
+
+# Overlays generados desde las plantillas .tmpl
+patches/creg.cordis.yml
+
+# Salida compilada del plugin de marca (se compila dentro del harness)
+branding/dsh-client-ui-brand-enersinc/lib/
+
+.DS_Store

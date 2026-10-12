@@ -1,0 +1,11 @@
+{
+  "name": "company-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.28.5",
+  "description": "Complementos del equipo para DeepSeek Harness: plugins, skills y perfiles. Capacidad: la CREG.",
+  "scripts": {
+    "start": "bash scripts/run.sh"
+  }
+}

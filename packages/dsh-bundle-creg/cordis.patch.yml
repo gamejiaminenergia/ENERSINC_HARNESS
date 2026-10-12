@@ -1,0 +1,14 @@
+# Bundle del cliente CREG para DeepSeek Harness.
+#
+# Inserta el plugin nativo `@enersinc/dsh-bundle-creg`, que registra las
+# herramientas `creg_ask`, `creg_health` y `creg_stats` (adaptador HTTP sobre el
+# servicio `regulatorio/`).
+#
+# `baseUrl` sale de CREG_URL (default http://127.0.0.1:3100; el 3000 suele estar
+# ocupado por otro servicio local).
+
+- insert:
+    - id: creg-tools
+      name: '@enersinc/dsh-bundle-creg'
+      config:
+        baseUrl: !!js "process.env.CREG_URL ?? 'http://127.0.0.1:3100'"

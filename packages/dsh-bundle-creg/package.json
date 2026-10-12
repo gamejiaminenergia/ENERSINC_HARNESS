@@ -1,0 +1,23 @@
+{
+  "name": "@enersinc/dsh-bundle-creg",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Complemento de DeepSeek Harness: herramientas nativas del cliente CREG (regulacion energetica colombiana). Bundle + plugin en un solo paquete.",
+  "exports": "./index.js",
+  "main": "./index.js",
+  "files": [
+    "index.js",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/schemastery": "*"
+  }
+}

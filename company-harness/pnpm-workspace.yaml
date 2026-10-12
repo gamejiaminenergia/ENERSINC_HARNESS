@@ -1,0 +1,5 @@
+# Solo los puentes MCP pertenecen a este workspace: sus dependencias (SDK de MCP,
+# zod) se instalan aqui. Los bundles `dsh-bundle-*` los instala `dsh` en el
+# perfil (sus peers @deepseek-ai/* los resuelve el runtime de dsh, no npm).
+packages:
+  - 'packages/mcp-*'
