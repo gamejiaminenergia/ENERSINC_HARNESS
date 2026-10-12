@@ -11,6 +11,7 @@
   },
   "scripts": {
     "setup": "bash scripts/setup.sh",
+    "key": "bash scripts/setup-key.sh",
     "run": "bash scripts/run.sh",
     "web": "bash scripts/web.sh",
     "doctor": "bash scripts/doctor.sh",

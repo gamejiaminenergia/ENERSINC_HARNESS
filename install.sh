@@ -4,8 +4,8 @@
 #   curl -fsSL https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.sh | sh
 #
 # Clona (o actualiza) este repo y ejecuta el setup completo: congela DeepSeek
-# Harness, aplica la marca ENERSINC a la Web UI, y deja la capacidad CREG activa
-# por defecto en el perfil `enersinc`.
+# Harness, aplica la marca ENERSINC a la Web UI, deja la capacidad CREG activa
+# por defecto y te pide tu llave de DeepSeek para que el asistente responda.
 #
 # Variables de entorno:
 #   ENERSINC_HOME       directorio del checkout   (default: ~/.enersinc-harness)

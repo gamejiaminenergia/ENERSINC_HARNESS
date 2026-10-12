@@ -17,7 +17,7 @@ check() { # describe, command...
 }
 
 echo "[1/4] Sintaxis de los scripts de shell"
-for f in install.sh scripts/setup.sh scripts/run.sh scripts/web.sh scripts/doctor.sh scripts/ci-check.sh; do
+for f in install.sh scripts/setup.sh scripts/setup-key.sh scripts/lib.sh scripts/run.sh scripts/web.sh scripts/doctor.sh scripts/ci-check.sh; do
   check "bash -n $f" bash -n "$f"
 done
 

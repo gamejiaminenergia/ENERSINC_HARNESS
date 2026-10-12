@@ -1,165 +1,171 @@
 # ENERSINC Harness
 
-[![Harness](https://img.shields.io/badge/DeepSeek%20Harness-dsh--v0.2.1--alpha.2-0D86C9)](https://github.com/deepseek-ai/deepseek-harness)
-[![Node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen)](https://nodejs.org)
-[![Plataformas](https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20Windows-9cf)](#instalación)
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+**El asistente de ENERSINC para preguntas de regulación de energía.** Se maneja
+como WhatsApp: escribes una pregunta en español y te responde usando la
+información de la **CREG** (Comisión de Regulación de Energía y Gas).
 
-> **DeepSeek Harness** congelado, con la **marca ENERSINC** en la Web UI y la
-> capacidad **CREG** (regulación energética colombiana) activa por defecto.
+No hay que programar nada. Solo copiar un comando, pegar tu llave y escribir tus
+preguntas.
 
-Este repo **no forkea** el harness: lo usa tal cual y demuestra que **se deja
-modificar** — la marca ENERSINC se integra como un *plugin de cliente* en el
-sistema de slots del Web UI, y la CREG como un *bundle* de herramientas nativas
-(`creg_ask`, `creg_health`, `creg_stats`).
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│  🐳 DeepSeek Harness ──│── ENERSINC        ← marca en la UI   │
-│  herramientas: creg_ask · creg_health · creg_stats            │
-└──────────────────────────────────────────────────────────────┘
-```
+> Arriba, en la ventana del asistente, verás el logo de ENERSINC junto al de
+> DeepSeek. Así sabes que es el asistente de la empresa.
 
 ---
 
-## Instalación
+## 1. Instalar (una sola vez)
 
-Un solo comando (clona este repo, congela el harness, aplica la marca y deja la
-CREG lista y activa por defecto):
+Abre la **Terminal** (en Windows, **PowerShell**), copia y pega **esta línea** y
+pulsa Enter:
 
-### macOS · Linux · Git Bash (Windows)
+**Mac / Linux**
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.sh | sh
 ```
 
-### Windows (PowerShell)
+**Windows**
 
 ```powershell
 irm https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.ps1 | iex
 ```
 
-El instalador deja todo en `~/.enersinc-harness` (configurable con
-`ENERSINC_HOME`). Al terminar:
+Va a trabajar unos minutos (la primera vez descarga cosas). Sigue las
+instrucciones en pantalla. **Cuando te pida la llave, pégala y pulsa Enter**: no
+se ve mientras la escribes, es normal.
 
-- **crea los perfiles** `enersinc` (Web UI) y `enersinc-cli` (headless),
-- **engancha** el bundle CREG en ambos perfiles,
-- **instala** las dependencias del servicio CREG (modo `direct`, sin Chromium),
-- **compila** el harness con el logo ENERSINC integrado.
+### ¿Qué es "la llave"?
 
-> La primera instalación clona y compila DeepSeek Harness: tarda unos minutos y
-> necesita red. Después arranca en segundos.
+Es como una **contraseña personal** que te da DeepSeek para poder usar el
+asistente. Empieza con `sk-`. La pide quien administra la cuenta del equipo. Se
+guarda solo en tu computador y no se comparte con nadie.
 
-### Requisitos
+> Si no tienes llave todavía, deja que el instalador termine y pídesela a quien
+> administra el asistente; luego corre `~/.enersinc-harness/scripts/setup-key.sh`
+> (o `scripts\setup-key.ps1` en Windows) para agregarla.
 
-| Herramienta | Versión | Nota |
-| --- | --- | --- |
-| Node.js | ≥ 22 (recomendado 24) | el build usa *type stripping* nativo |
-| pnpm | vía `corepack` | el instalador lo activa |
-| git | cualquiera | para clonar el harness y este repo |
-| bash | — | en Windows, viene con Git for Bash |
+## 2. Usarlo
 
-## Uso
+### Abrir la ventana del asistente
 
-```bash
-cd ~/.enersinc-harness
+Copia y pega:
 
-# Interfaz web (levanta CREG y abre el navegador)
-./scripts/web.sh
+**Mac / Linux**
 
-# Una tarea headless
-./scripts/run.sh "Usa creg_ask para preguntar '¿Qué es la CREG?'"
-
-# Diagnóstico del entorno
-./scripts/doctor.sh
+```sh
+~/.enersinc-harness/scripts/web.sh
 ```
 
-En Windows:
+**Windows**
 
 ```powershell
-cd $env:USERPROFILE\.enersinc-harness
-powershell -ExecutionPolicy Bypass -File scripts\web.ps1
-powershell -ExecutionPolicy Bypass -File scripts\run.ps1 "Usa creg_ask para preguntar '¿Qué es la CREG?'"
+powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\.enersinc-harness\scripts\web.ps1
 ```
 
-Antes de usar el modelo, pega tu llave en `.env`:
+Se abre el asistente en el navegador. Escribe tu pregunta como se la harías a un
+compañero.
 
-```dotenv
-DEEPSEEK_API_KEY=sk-...
+### O hacer una sola pregunta aquí mismo
+
+**Mac / Linux**
+
+```sh
+~/.enersinc-harness/scripts/run.sh "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
 ```
 
-## Cómo se modifica la Web UI (la marca ENERSINC)
+**Windows**
 
-La Web UI de `dsh` compone su barra lateral con **slots**
-(`sidebar.brand.mark`, `sidebar.brand.name`). Un plugin de cliente dinámico
-registrado en un slot de un solo ocupante **se renderiza por encima** del
-entregado de fábrica. Eso es todo lo que usamos:
-
-```text
-branding/dsh-client-ui-brand-enersinc/   ← el plugin (fuente de verdad)
-        │  scripts/brand/apply.mjs lo copia a
-        ▼
-vendor/deepseek-harness/packages/client/ui-brand-enersinc/
-        │  el build (tsdown) emite lib/client.js
-        ▼
-Web UI:  🐳 (marca DeepSeek intacta)  +  ENERSINC (logo nuevo)
+```powershell
+powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\.enersinc-harness\scripts\run.ps1 "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
 ```
 
-- No se toca el núcleo de `dsh`: sólo se **añade** un paquete al workspace.
-- El logo vive en `branding/enersinc-logo.svg` y se regenera a React con
-  `pnpm brand:logo`.
-- Detalles en [`docs/BRANDING.md`](docs/BRANDING.md) y en el
-  [`README` del plugin](branding/dsh-client-ui-brand-enersinc/README.md).
+## 3. Qué le puedes preguntar
 
-Puedes desactivar la marca con `ENERSINC_SKIP_BRAND=1 ./scripts/setup.sh`, o
-cambiar el título de la pestaña con `DSH_CLIENT_TITLE="Mi título"`.
+Ejemplos reales:
 
-## La capacidad CREG
+- "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
+- "Explícame cómo funciona el cargo por confiabilidad."
+- "¿Qué dice la CREG sobre las tarifas de energía para usuarios residenciales?"
+- "Resume la última resolución sobre comercialización de energía."
 
-El servicio `services/creg/` (Express + cliente CREG) se expone al harness de
-dos formas:
+El asistente responde con lo que encuentre en la CREG. Si algo no lo sabe, te lo
+dice en vez de inventarlo.
 
-| Camino | Cómo | Herramientas |
-| --- | --- | --- |
-| **Nativo** (default) | bundle `packages/dsh-bundle-creg` en el perfil | `creg_ask`, `creg_health`, `creg_stats` |
-| **MCP** (opcional) | `MODE=mcp` monta el overlay `patches/creg.cordis.yml` | `mcp__creg__*` |
+## 4. Si algo no funciona
 
-Modos del cliente: `CREG_MODE=direct` (default, sin navegador),
-`auto` (API con respaldo en navegador) o `browser`. Ver
-[`docs/CREG.md`](docs/CREG.md) y [`services/creg/README.md`](services/creg/README.md).
+| Lo que ves | Qué hacer |
+| --- | --- |
+| "no pude levantar el servicio CREG" | Cierra la ventana y vuelve a abrirla con el comando del punto 2. |
+| "falta tu llave" o no responde nada | Corre `~/.enersinc-harness/scripts/setup-key.sh` (o `scripts\setup-key.ps1` en Windows) y pega tu llave. |
+| Te cambió la llave | Corre `scripts/setup-key.sh` (o `scripts\setup-key.ps1`) y pega la nueva. |
+| Cualquier otra cosa | Corre `~/.enersinc-harness/scripts/doctor.sh` y envía lo que salga a soporte. |
 
-## Estructura del repo
+## 5. Requisitos
+
+Solo necesitas **Node.js** y **git** instalados. Si no los tienes, pídele a
+soporte que te los instale (o corre el instalador y sigue las instrucciones que
+aparezcan). El resto lo hace solo.
+
+---
+
+<details>
+<summary><strong>Para el área técnica</strong> (arquitectura, variables, cómo se modificó la interfaz)</summary>
+
+### Qué es
+
+Un **DeepSeek Harness** congelado (ver [`dsh.lock`](dsh.lock), tag
+`dsh-v0.2.1-alpha.2`) más:
+
+- un **plugin de cliente** que pone el logo ENERSINC en la barra lateral
+  (`sidebar.brand.name`) sin tocar el núcleo del harness
+  ([`docs/BRANDING.md`](docs/BRANDING.md));
+- la capacidad **CREG** como bundle nativo (`creg_ask`, `creg_health`,
+  `creg_stats`) activa por defecto en los perfiles `enersinc` y `enersinc-cli`
+  ([`docs/CREG.md`](docs/CREG.md));
+- el servicio CREG local en `services/creg/` (Express + cliente, modo `direct`
+  sin Chromium).
+
+### Estructura
 
 ```
-install.sh · install.ps1     instaladores de una línea (POSIX / Windows)
-dsh.lock                     versión congelada de DeepSeek Harness
-scripts/
-  setup.sh                   congela dsh, aplica la marca, configura CREG
-  run.sh · web.sh            ejecución headless / interfaz web
-  run.ps1 · web.ps1          equivalentes Windows
-  doctor.sh                  diagnóstico del entorno
-  brand/apply.mjs            aplica el overlay de marca al checkout de dsh
-  brand/gen-logo.mjs         regenera el componente React del logo
-branding/
-  enersinc-logo.svg          logo fuente (sin metadatos C2PA)
-  dsh-client-ui-brand-enersinc/  plugin de cliente (marca en la Web UI)
-packages/
-  dsh-bundle-creg/           plugin nativo con las herramientas creg_*
-  mcp-creg/                  puente MCP hacia el servicio CREG
-patches/creg.cordis.yml.tmpl overlay MCP (plantilla)
-services/creg/               servicio CREG (Express + cliente)
-skills/uso-de-creg/          skill que enseña al modelo a usar las creg_*
-docs/                        arquitectura, marca y CREG
+install.sh · install.ps1        instaladores de una línea
+scripts/setup.sh                congela dsh, aplica marca, pide la llave, crea perfiles
+scripts/setup-key.sh · .ps1     cambiar/agregar la llave
+scripts/run.sh · web.sh         ejecución headless / interfaz web
+scripts/run.ps1 · web.ps1       equivalentes Windows
+scripts/doctor.sh               diagnóstico
+scripts/lib.sh                  utilidades (llave, .env)
+scripts/brand/apply.mjs         aplica el overlay de marca al checkout de dsh
+scripts/brand/gen-logo.mjs      regenera el componente del logo
+branding/dsh-client-ui-brand-enersinc/   plugin de marca (Web UI)
+packages/dsh-bundle-creg/       plugin nativo creg_*
+packages/mcp-creg/              puente MCP (opcional)
+services/creg/                  servicio CREG
+skills/uso-de-creg/             skill que orienta al modelo
+docs/                           arquitectura, marca, CREG
 ```
 
-## Cómo citar el harness
+### Variables y configuración
 
-Este proyecto complementa DeepSeek Harness (MIT) y se apoya en su modelo de
-plugins y slots. La versión congelada está en [`dsh.lock`](dsh.lock); actualizarla
-es deliberado: cambia el tag, corre `./scripts/setup.sh` y verifica con
-`./scripts/doctor.sh`.
+- La llave se guarda en `.env` (`DEEPSEEK_API_KEY`), que **no** se sube al repo
+  (está en `.gitignore`). La interfaz los esconde tras el prompt del instalador.
+- Sin interacción: `DEEPSEEK_API_KEY=sk-... ./scripts/setup.sh`.
+- Volver a pedir la llave: `ENERSINC_FORCE_KEY=1 ./scripts/setup.sh`.
+- CREG: `CREG_URL` (default `http://127.0.0.1:3100`), `CREG_MODE` (`direct` por
+  defecto).
+- Título de la pestaña: `DSH_CLIENT_TITLE` (default `ENERSINC Harness`).
+- Omitir la marca: `ENERSINC_SKIP_BRAND=1 ./scripts/setup.sh`.
 
-## Licencia
+### Verificación
 
-[MIT](LICENSE). "DeepSeek Harness" es una marca de DeepSeek; este es un proyecto
-independiente de ENERSINC, no afiliado ni patrocinado por DeepSeek.
+```bash
+bash scripts/ci-check.sh      # sintaxis, generador de logo y overlay idempotente
+./scripts/doctor.sh           # entorno, marca y CREG
+```
+
+### Licencia
+
+[MIT](LICENSE). El logo ENERSINC es marca de ENERSINC. "DeepSeek Harness" es
+marca de DeepSeek; este es un proyecto independiente de ENERSINC, no afiliado ni
+patrocinado por DeepSeek.
+
+</details>

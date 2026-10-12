@@ -3,7 +3,8 @@
   ENERSINC Harness — instalador para Windows (PowerShell 5+).
 .DESCRIPTION
   Descarga este repo, congela DeepSeek Harness, aplica la marca ENERSINC a la
-  Web UI y deja la capacidad CREG activa por defecto en el perfil `enersinc`.
+  Web UI, deja la capacidad CREG activa por defecto y te pide tu llave de
+  DeepSeek para que el asistente pueda responder.
 
   Uso (una línea):
 
@@ -89,14 +90,33 @@ try {
   Invoke-Pnpm run build
 } finally { Pop-Location }
 
-Say '[4/7] Configurando .env ...'
+Say '[4/7] Configurando tu llave del modelo ...'
 $envFile = Join-Path $HomeDir '.env'
-if (-not (Test-Path $envFile)) {
-  Copy-Item (Join-Path $HomeDir '.env.example') $envFile
-  Say '  creado .env (pega tu DEEPSEEK_API_KEY)'
+if (-not (Test-Path $envFile)) { Copy-Item (Join-Path $HomeDir '.env.example') $envFile }
+$existing = ''
+Get-Content $envFile | ForEach-Object { if ($_ -match '^DEEPSEEK_API_KEY=(.*)$') { $existing = $matches[1] } }
+$key = if ($env:DEEPSEEK_API_KEY) { $env:DEEPSEEK_API_KEY } else { $existing }
+if (-not $key -or $env:ENERSINC_FORCE_KEY -eq '1') {
+  Say ''
+  Say '  Hace falta tu llave de DeepSeek para que el asistente pueda responder.'
+  Say "  Empieza con 'sk-'. Pegala abajo y pulsa Enter (no se vera en pantalla)."
+  $secure = Read-Host '  Llave' -AsSecureString
+  $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
+  try { $key = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
+  finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
 }
-$dshEnv = Join-Path $DSH '.env'
-if (-not (Test-Path $dshEnv)) { Copy-Item $envFile $dshEnv -ErrorAction SilentlyContinue }
+if ($key) {
+  $found = $false
+  $lines = Get-Content $envFile | ForEach-Object {
+    if ($_ -match '^DEEPSEEK_API_KEY=') { $found = $true; "DEEPSEEK_API_KEY=$key" } else { $_ }
+  }
+  if (-not $found) { $lines += "DEEPSEEK_API_KEY=$key" }
+  Set-Content -Path $envFile -Value $lines
+  Say '  llave guardada en este equipo. No se comparte con nadie.'
+} else {
+  Say "  AVISO: seguimos sin llave. Cuando la tengas, corre: ./scripts/setup-key.sh"
+}
+Copy-Item $envFile (Join-Path $DSH '.env') -Force -ErrorAction SilentlyContinue
 
 Say '[5/7] Dependencias del workspace y del servicio CREG ...'
 Invoke-Pnpm install
@@ -129,5 +149,10 @@ $posixHome = $HomeDir -replace '\\', '/'
   Set-Content (Join-Path $HomeDir 'patches/creg.cordis.yml')
 
 Say ''
-Say 'Listo. La capacidad CREG queda activa por defecto en el perfil enersinc.'
-Say "  Web UI:  powershell -File `"$HomeDir/scripts/web.ps1`""
+Say '¡Listo! Ya puedes hablar con el asistente.'
+Say ''
+Say '  Para abrir la ventana del asistente (interfaz web):'
+Say "      powershell -ExecutionPolicy Bypass -File `"$HomeDir/scripts/web.ps1`""
+Say ''
+Say '  Para hacerle una pregunta y ver la respuesta en esta ventana:'
+Say "      powershell -ExecutionPolicy Bypass -File `"$HomeDir/scripts/run.ps1`" `"Pregunta a la CREG que es la CREG`""

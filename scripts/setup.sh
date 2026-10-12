@@ -1,17 +1,23 @@
 #!/usr/bin/env bash
 # Setup de ENERSINC Harness: congela dsh, aplica la marca ENERSINC a la Web UI,
-# instala todo y deja los perfiles con las herramientas creg_* activas por defecto.
+# instala todo, deja los perfiles con las herramientas creg_* activas por defecto
+# y pide (si hace falta) la llave del modelo.
 #
 #   ./scripts/setup.sh
 #
 # Variables:
-#   DSH_HOME            directorio del harness del usuario (default: ~/.dsh)
-#   DSH_CLIENT_TITLE    título de la pestaña del navegador (default: "ENERSINC Harness")
+#   DEEPSEEK_API_KEY    si ya la tienes, se usa y no se pregunta
+#   DSH_HOME            carpeta del harness del usuario (default: ~/.dsh)
+#   DSH_CLIENT_TITLE    titulo de la pestana del navegador (default: ENERSINC Harness)
 #   ENERSINC_SKIP_BRAND =1 para omitir el overlay de marca
+#   ENERSINC_FORCE_KEY  =1 para volver a preguntar la llave aunque ya exista
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$HERE"
+
+# shellcheck source=scripts/lib.sh
+. "$HERE/scripts/lib.sh"
 
 # shellcheck disable=SC1091
 source ./dsh.lock
@@ -32,7 +38,7 @@ else
   echo "  commit verificado: $got"
 fi
 
-echo "[2/7] Aplicando la marca ENERSINC a la Web UI ..."
+echo "[2/7] Aplicando la marca ENERSINC a la interfaz ..."
 if [ "${ENERSINC_SKIP_BRAND:-0}" = "1" ]; then
   echo "  omitido (ENERSINC_SKIP_BRAND=1)"
 else
@@ -42,15 +48,19 @@ fi
 echo "[3/7] Instalando y compilando el harness (DSH_CLIENT_TITLE=$DSH_CLIENT_TITLE) ..."
 ( cd "$DSH" && $PNPM install --no-frozen-lockfile && $PNPM run build )
 
-echo "[4/7] Configurando .env ..."
-if [ ! -f .env ]; then cp .env.example .env; echo "  creado .env (pega tu DEEPSEEK_API_KEY)"; fi
-[ -f "$DSH/.env" ] || cp .env "$DSH/.env" 2>/dev/null || true
+echo "[4/7] Configurando tu llave del modelo ..."
+if save_api_key_from_prompt "$HERE/.env" "${ENERSINC_FORCE_KEY:-}"; then
+  echo "  llave guardada en este equipo. No se comparte con nadie."
+else
+  echo "  AVISO: seguimos sin llave. Cuando la tengas, corre: ./scripts/setup-key.sh"
+fi
+cp -f "$HERE/.env" "$DSH/.env" 2>/dev/null || true
 
-echo "[5/7] Dependencias del workspace y del servicio CREG ..."
+echo "[5/7] Dependencias del servicio CREG ..."
 $PNPM install
 if [ ! -d services/creg/node_modules ]; then
   ( cd services/creg && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-audit --no-fund >/dev/null 2>&1 )
-  echo "  servicio CREG instalado (modo direct, sin Chromium)"
+  echo "  servicio CREG instalado (modo direct, sin navegador)"
 fi
 
 echo "[6/7] Creando perfiles enersinc (web) y enersinc-cli (headless) con CREG activo ..."
@@ -67,7 +77,10 @@ cp -R "$HERE/skills/." "$DSH_HOME/skills/"
 sed "s#__ENERSINC_HARNESS__#$HERE#g" "$HERE/patches/creg.cordis.yml.tmpl" > "$HERE/patches/creg.cordis.yml"
 
 echo
-echo "Listo. La capacidad CREG queda activa por defecto en el perfil 'enersinc'."
-echo "Prueba:"
-echo "  $HERE/scripts/run.sh \"Usa creg_ask para preguntar 'Que es la CREG?'\""
-echo "  $HERE/scripts/web.sh    # interfaz web (logo ENERSINC incluido)"
+echo "¡Listo! Ya puedes hablar con el asistente."
+echo
+echo "  Para abrir la ventana del asistente (interfaz web):"
+echo "      $HERE/scripts/web.sh"
+echo
+echo "  Para hacerle una pregunta y ver la respuesta aqui mismo:"
+echo "      $HERE/scripts/run.sh \"Pregunta a la CREG que es la CREG\""
