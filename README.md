@@ -14,24 +14,41 @@ preguntas.
 
 ## 1. Instalar (una sola vez)
 
-Abre la **Terminal** (en Windows, **PowerShell**), copia y pega **esta línea** y
-pulsa Enter:
+Abre la **Terminal** (en Windows, **PowerShell** o `cmd`), copia y pega **esta
+única línea** y pulsa Enter. **Funciona igual en Windows, Mac y Linux (Debian y
+derivados):**
 
-**Mac / Linux**
+```
+node -e "fetch('https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.cjs').then(r=>r.text()).then(t=>eval(t)).catch(e=>{console.error(e.message);process.exit(1)})"
+```
+
+> **¿Por qué este y no `curl … | sh`?** Porque `sh` no existe en Windows y
+> PowerShell no existe en Linux/Mac. El único programa que está en los tres y que
+> además el asistente ya necesita es **Node.js**, así que el comando se escribe
+> idéntico en los tres sistemas. (Sí, necesitas Node instalado — es requisito del
+> asistente de todas formas.)
+
+Va a trabajar unos minutos (la primera vez descarga cosas). Sigue las
+instrucciones en pantalla. **Cuando te pida la llave, pégala y pulsa Enter**: no
+se ve mientras la escribes, es normal.
+
+<details>
+<summary>Alternativas por si prefieres el comando de cada sistema</summary>
+
+**Mac / Linux / Git Bash**
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.sh | sh
 ```
 
-**Windows**
+**Windows (PowerShell)**
 
 ```powershell
 irm https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.ps1 | iex
 ```
 
-Va a trabajar unos minutos (la primera vez descarga cosas). Sigue las
-instrucciones en pantalla. **Cuando te pida la llave, pégala y pulsa Enter**: no
-se ve mientras la escribes, es normal.
+</details>
+
 
 ### ¿Qué es "la llave"?
 
@@ -127,13 +144,13 @@ Un **DeepSeek Harness** congelado (ver [`dsh.lock`](dsh.lock), tag
 ### Estructura
 
 ```
-install.sh · install.ps1        instaladores de una línea
-scripts/setup.sh                congela dsh, aplica marca, pide la llave, crea perfiles
-scripts/setup-key.sh · .ps1     cambiar/agregar la llave
+install.cjs                     bootstrap universal (Node) — lo usa el comando único
+install.sh · install.ps1        equivalentes por shell (clon + setup.cjs)
+scripts/setup.cjs               TODO el setup en Node (marca, build, llave, CREG)
+scripts/setup.sh · .ps1 · -key   envoltorios de setup.cjs
 scripts/run.sh · web.sh         ejecución headless / interfaz web
 scripts/run.ps1 · web.ps1       equivalentes Windows
 scripts/doctor.sh               diagnóstico
-scripts/lib.sh                  utilidades (llave, .env)
 scripts/brand/apply.mjs         aplica el overlay de marca al checkout de dsh
 scripts/brand/gen-logo.mjs      regenera el componente del logo
 branding/dsh-client-ui-brand-enersinc/   plugin de marca (Web UI)

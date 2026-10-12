@@ -33,14 +33,16 @@ por script).
 
 ## Flujo de instalación
 
-1. `install.sh` / `install.ps1` clonan este repo en `~/.enersinc-harness`.
-2. `setup.sh` congela `dsh` en `vendor/deepseek-harness` (verifica el commit de
-   `dsh.lock`).
+1. El **comando universal** (`node -e "…fetch…eval…"`) descarga `install.cjs`;
+   `install.sh` / `install.ps1` hacen lo mismo desde su shell. Clonan este repo
+   en `~/.enersinc-harness`.
+2. `scripts/setup.cjs` (la única implementación del setup, en Node) congela
+   `dsh` en `vendor/deepseek-harness` (verifica el commit de `dsh.lock`).
 3. `scripts/brand/apply.mjs` copia el plugin de marca al workspace del harness.
 4. `pnpm install --no-frozen-lockfile && pnpm run build` compila el harness
    (y con él, el plugin de marca).
-5. Se crean los perfiles `enersinc` (web) y `enersinc-cli` (headless) y se
-   engancha el bundle CREG.
+5. Se pide/guarda la llave del modelo y se crean los perfiles `enersinc` (web) y
+   `enersinc-cli` (headless), enganchando el bundle CREG.
 6. Se copian las skills y se genera el overlay MCP.
 
 ## Perfiles
