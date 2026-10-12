@@ -12,6 +12,28 @@ preguntas.
 
 ---
 
+## Antes de empezar: 2 programas que debes tener
+
+El instalador **no funciona si a tu computador le falta Node.js o Git.** Son dos
+programas gratis y la mayoría de equipos ya los tienen. Para saberlo, abre la
+Terminal (en Windows, PowerShell o `cmd`) y pega esto, una línea a la vez:
+
+```sh
+node -v
+git --version
+```
+
+- Si cada uno responde con un **número de versión** (algo como `v24.11.0` o
+  `git version 2.43.0`), ya estás listo: sigue al paso 1.
+- Si dice *"no se reconoce el comando"* / *"command not found"*, instálalos:
+  - **Node.js** → https://nodejs.org (elige la versión **LTS**).
+  - **Git** → https://git-scm.com/downloads
+
+  Después **cierra y abre la Terminal** y vuelve a probar `node -v`.
+
+> Sin Node.js y Git **no se puede instalar**. Una vez los tengas, el instalador
+> hace todo lo demás solo.
+
 ## 1. Instalar (una sola vez)
 
 Abre la **Terminal** (en Windows, **PowerShell** o `cmd`), copia y pega **esta
@@ -118,9 +140,19 @@ dice en vez de inventarlo.
 
 ## 5. Requisitos
 
-Solo necesitas **Node.js** y **git** instalados. Si no los tienes, pídele a
-soporte que te los instale (o corre el instalador y sigue las instrucciones que
-aparezcan). El resto lo hace solo.
+- **Node.js** (versión 22 o superior; recomendado 24) y **Git** — ver
+  [Antes de empezar](#antes-de-empezar-2-programas-que-debes-tener).
+- En **Linux**, para compilar el harness hace falta el compilador de C. Si el
+  instalador falla con un error de compilación, corre:
+
+  ```sh
+  sudo apt update && sudo apt install -y build-essential
+  ```
+
+  y vuelve a lanzar el comando de instalación.
+
+Sin esos programas el asistente **no se puede instalar** en ninguna máquina. Es
+el único requisito previo; el resto lo hace el instalador.
 
 ---
 
