@@ -1,226 +1,278 @@
 # ENERSINC Harness
 
-**El asistente de ENERSINC para preguntas de regulación de energía.** Se maneja
-como WhatsApp: escribes una pregunta en español y te responde usando la
-información de la **CREG** (Comisión de Regulación de Energía y Gas).
+<p align="center">
+  <img src="branding/enersinc-logo.svg" alt="ENERSINC" width="200" style="vertical-align: middle; margin-right: 20px;">
+  <img src="https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/main/docs/public/logo.svg" alt="DeepSeek Harness" width="180" style="vertical-align: middle;">
+</p>
 
-No hay que programar nada. Solo copiar un comando, pegar tu llave y escribir tus
-preguntas.
-
-> Arriba, en la ventana del asistente, verás el logo de ENERSINC junto al de
-> DeepSeek. Así sabes que es el asistente de la empresa.
+**El asistente de IA especializado en regulación energética colombiana (CREG)** para el equipo de ENERSINC. Basado en DeepSeek Harness, congelado y extendido con marca corporativa y capacidad CREG nativa.
 
 ---
 
-## Antes de empezar: 2 programas que debes tener
+## 🎯 Qué es y por qué genera valor para ENERSINC
 
-El instalador **no funciona si a tu computador le falta Node.js o Git.** Son dos
-programas gratis y la mayoría de equipos ya los tienen. Para saberlo, abre la
-Terminal (en Windows, PowerShell o `cmd`) y pega esto, una línea a la vez:
+> **En una frase:** *Acceso inmediato, privado y trazable al conocimiento regulatorio oficial de la CREG, con la identidad visual de ENERSINC y sin depender de terceros.*
 
-```sh
-node -v
-git --version
+| Problema del equipo | Cómo lo resuelve ENERSINC Harness |
+|---------------------|-----------------------------------|
+| **Buscar en la web de la CREG es lento y disperso** | Un chat que consulta **directamente el asistente de IA oficial de la CREG** — respuestas en segundos, con cita de norma/resolución |
+| **Riesgo de alucinaciones con LLMs genéricos** | **Fuente primaria única**: solo CREG. Si no está ahí, el asistente dice "no lo sé" en vez de inventar |
+| **Datos sensibles saliendo a APIs externas** | **Todo corre en tu máquina**: servicio CREG en `localhost:3100`, llave DeepSeek en `.env` local, cero telemetría |
+| **Curva de aprendizaje para no técnicos** | Interfaz web **estilo WhatsApp** — cero entrenamiento, pregunta como se lo harías a un compañero |
+| **Automatizar consultas repetitivas** | CLI `run.sh` + perfiles `enersinc-cli` para scripts, reportes, pipelines |
+| **Identidad de herramienta propia** | Logo **ENERSINC junto a DeepSeek** en la barra superior — el equipo reconoce "su" herramienta al instante |
+| **Mantenimiento y rotura por actualizaciones** | Harness **congelado en `dsh.lock`** (tag `dsh-v0.2.1-alpha.2`) — actualizas cuando *tú* decides, probando antes |
+| **Dependencia de un proveedor/consultor** | **Código abierto (MIT)**, instalable en cualquier máquina del equipo, cada quien con su llave DeepSeek |
+
+---
+
+## ✨ Ventajas clave
+
+| Ventaja | Qué significa para ti |
+|---------|----------------------|
+| **Fuente oficial** | Consulta **directamente** el asistente de IA de la CREG — nada de alucinaciones ni datos inventados |
+| **Privacidad local** | Tu llave DeepSeek y tus preguntas **nunca salen de tu máquina** (servicio CREG corre en `localhost:3100`) |
+| **Cero configuración** | Un comando instala todo: harness, marca, servicio CREG, perfiles y skill |
+| **Multiplataforma real** | Igual en Windows, macOS y Linux (Debian/Ubuntu/Arch/Fedora) — usa Node.js, no shells específicos |
+| **Versión congelada** | DeepSeek Harness fijado en `dsh-v0.2.1-alpha.2` (`dsh.lock`) — no se rompe por actualizaciones sorpresivas |
+| **Marca corporativa** | Logo ENERSINC junto a DeepSeek en la UI — identifica la herramienta del equipo al instante |
+| **Dos interfaces** | Web (chat estilo WhatsApp) **y** terminal (para scripts/automatización) |
+| **Modo `direct` por defecto** | Consulta la API de la CREG **sin Chromium** — rápido (~12-20s) y ligero |
+| **Diagnóstico incluido** | `doctor.sh` verifica requisitos, build, marca y CREG en segundos |
+| **Extensible** | Arquitectura de plugins + skills — añade más capacidades sin tocar el núcleo |
+
+---
+
+## ⚠️ Advertencias y limitaciones
+
+| Tema | Detalle |
+|------|---------|
+| **Solo regulación colombiana (CREG)** | No sabe de otras jurisdicciones, ni de mercado europeo, ni de temas legales generales |
+| **Dependencia de la CREG** | Si el asistente de la CREG cae o cambia su API, el servicio deja de funcionar |
+| **Primera instalación lenta** | Descarga y compila el harness (~5-10 min la primera vez); posteriores son instantáneas |
+| **Node.js ≥ 22 obligatorio** | En Linux necesitas `build-essential` para compilar dependencias nativas |
+| **Puerto 3100** | El servicio CREG usa `:3100` (el 3000 suele estar ocupado); asegúrate de que esté libre |
+| **Llave DeepSeek requerida** | Necesitas una cuenta DeepSeek con créditos; la clave se guarda **solo en tu `.env` local** |
+| **No es asesoría legal** | Las respuestas son informativas; valida con área legal antes de decisiones críticas |
+
+---
+
+## 💡 Tips y buenas prácticas
+
+| Situación | Recomendación |
+|-----------|---------------|
+| **Preguntas repetidas** | La caché ignora mayúsculas/espacios — repetir la misma pregunta sale instantáneo |
+| **Timeout (504)** | Vuelve a enviar **exactamente la misma pregunta**; el servicio reintenta automáticamente |
+| **Preguntas complejas** | Una pregunta por llamada; si necesitas varias, hazlas en mensajes separados |
+| **Verificar servicio** | `curl http://127.0.0.1:3100/health` antes de preguntar si algo falla |
+| **Actualizar harness** | Edita `dsh.lock` (tag + commit), corre `./scripts/setup.sh` y vuelve a probar `creg_*` |
+| **Sin interfaz gráfica (servidor)** | Usa `enersinc-cli` / `run.sh` — funciona 100% headless |
+| **Cambiar modo CREG** | `CREG_MODE=auto ./scripts/run.sh "..."` (prueba API y cae a navegador si falla) |
+| **Equipo nuevo** | Comparte solo el comando de instalación; cada quien pone su llave DeepSeek |
+
+---
+
+## 🏁 Conclusión
+
+ENERSINC Harness es la **capa de producto** que tu equipo necesita para consultar regulación energética colombiana con confianza:
+
+- **Instalación de una línea** → listo en minutos
+- **Fuente primaria (CREG)** → respuestas trazables, no inventadas
+- **Marca propia** → identificación visual inmediata en la UI
+- **Arquitectura sólida** → harness congelado + overlays idempotentes + CI automatizado
+- **Para desarrolladores y no desarrolladores** → interfaz web tipo chat + CLI para automatización
+
+> **Próximos pasos:** Ejecuta el comando universal, pega tu llave DeepSeek y pregunta: *"¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"*
+
+---
+
+## 🚀 Instalación rápida (una sola vez)
+
+### Requisitos previos
+
+**Node.js ≥ 22** (recomendado 24 LTS) y **Git**.
+
+#### Instalación por terminal
+
+| OS | Node.js | Git |
+|----|---------|-----|
+| **Windows (PowerShell)** | `winget install OpenJS.NodeJS.LTS` | `winget install Git.Git` |
+| **macOS (Homebrew)** | `brew install node@24` | `brew install git` |
+| **Linux (Debian/Ubuntu)** | `curl -fsSL https://deb.nodesource.com/setup_24.x \| sudo -E bash - && sudo apt install -y nodejs` | `sudo apt update && sudo apt install -y git` |
+| **Linux (Arch)** | `sudo pacman -S nodejs npm` | `sudo pacman -S git` |
+| **Linux (Fedora)** | `sudo dnf install nodejs` | `sudo dnf install git` |
+
+> **Nota:** En Windows, si `winget` no está disponible, descarga los instaladores de [nodejs.org](https://nodejs.org) y [git-scm.com](https://git-scm.com).
+
+```bash
+# Verifica que los tienes
+node -v && git --version
+# Debe mostrar algo como: v24.x.x  y  git version 2.x.x
 ```
 
-- Si cada uno responde con un **número de versión** (algo como `v24.11.0` o
-  `git version 2.43.0`), ya estás listo: sigue al paso 1.
-- Si dice *"no se reconoce el comando"* / *"command not found"*, instálalos:
-  - **Node.js** → https://nodejs.org (elige la versión **LTS**).
-  - **Git** → https://git-scm.com/downloads
+### Comando universal (Windows, macOS, Linux)
 
-  Después **cierra y abre la Terminal** y vuelve a probar `node -v`.
-
-> Sin Node.js y Git **no se puede instalar**. Una vez los tengas, el instalador
-> hace todo lo demás solo.
-
-## 1. Instalar (una sola vez)
-
-Abre la **Terminal** (en Windows, **PowerShell** o `cmd`), copia y pega **esta
-única línea** y pulsa Enter. **Funciona igual en Windows, Mac y Linux (Debian y
-derivados):**
-
-```
+```bash
 node -e "fetch('https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.cjs').then(r=>r.text()).then(t=>eval(t)).catch(e=>{console.error(e.message);process.exit(1)})"
 ```
 
-> **¿Por qué este y no `curl … | sh`?** Porque `sh` no existe en Windows y
-> PowerShell no existe en Linux/Mac. El único programa que está en los tres y que
-> además el asistente ya necesita es **Node.js**, así que el comando se escribe
-> idéntico en los tres sistemas. (Sí, necesitas Node instalado — es requisito del
-> asistente de todas formas.)
+> **¿Por qué Node y no `curl | sh`?** Porque `sh` no existe en Windows y PowerShell no existe en Linux/Mac. Node.js ya es requisito del asistente.
 
-Va a trabajar unos minutos (la primera vez descarga cosas). Sigue las
-instrucciones en pantalla. **Cuando te pida la llave, pégala y pulsa Enter**: no
-se ve mientras la escribes, es normal.
-
-<details>
-<summary>Alternativas por si prefieres el comando de cada sistema</summary>
-
-**Mac / Linux / Git Bash**
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.sh | sh
-```
-
-**Windows (PowerShell)**
-
-```powershell
-irm https://raw.githubusercontent.com/gamejia/enersinc-harness/main/install.ps1 | iex
-```
-
-</details>
-
-
-### ¿Qué es "la llave"?
-
-Es como una **contraseña personal** que te da DeepSeek para poder usar el
-asistente. Empieza con `sk-`. La pide quien administra la cuenta del equipo. Se
-guarda solo en tu computador y no se comparte con nadie.
-
-> Si no tienes llave todavía, deja que el instalador termine y pídesela a quien
-> administra el asistente; luego corre `~/.enersinc-harness/scripts/setup-key.sh`
-> (o `scripts\setup-key.ps1` en Windows) para agregarla.
-
-## 2. Usarlo
-
-### Abrir la ventana del asistente
-
-Copia y pega:
-
-**Mac / Linux**
-
-```sh
-~/.enersinc-harness/scripts/web.sh
-```
-
-**Windows**
-
-```powershell
-powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\.enersinc-harness\scripts\web.ps1
-```
-
-Se abre el asistente en el navegador. Escribe tu pregunta como se la harías a un
-compañero.
-
-### O hacer una sola pregunta aquí mismo
-
-**Mac / Linux**
-
-```sh
-~/.enersinc-harness/scripts/run.sh "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
-```
-
-**Windows**
-
-```powershell
-powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\.enersinc-harness\scripts\run.ps1 "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
-```
-
-## 3. Qué le puedes preguntar
-
-Ejemplos reales:
-
-- "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
-- "Explícame cómo funciona el cargo por confiabilidad."
-- "¿Qué dice la CREG sobre las tarifas de energía para usuarios residenciales?"
-- "Resume la última resolución sobre comercialización de energía."
-
-El asistente responde con lo que encuentre en la CREG. Si algo no lo sabe, te lo
-dice en vez de inventarlo.
-
-## 4. Si algo no funciona
-
-| Lo que ves | Qué hacer |
-| --- | --- |
-| "no pude levantar el servicio CREG" | Cierra la ventana y vuelve a abrirla con el comando del punto 2. |
-| "falta tu llave" o no responde nada | Corre `~/.enersinc-harness/scripts/setup-key.sh` (o `scripts\setup-key.ps1` en Windows) y pega tu llave. |
-| Te cambió la llave | Corre `scripts/setup-key.sh` (o `scripts\setup-key.ps1`) y pega la nueva. |
-| Cualquier otra cosa | Corre `~/.enersinc-harness/scripts/doctor.sh` y envía lo que salga a soporte. |
-
-## 5. Requisitos
-
-- **Node.js** (versión 22 o superior; recomendado 24) y **Git** — ver
-  [Antes de empezar](#antes-de-empezar-2-programas-que-debes-tener).
-- En **Linux**, para compilar el harness hace falta el compilador de C. Si el
-  instalador falla con un error de compilación, corre:
-
-  ```sh
-  sudo apt update && sudo apt install -y build-essential
-  ```
-
-  y vuelve a lanzar el comando de instalación.
-
-Sin esos programas el asistente **no se puede instalar** en ninguna máquina. Es
-el único requisito previo; el resto lo hace el instalador.
+El instalador:
+1. Clona el repo en `~/.enersinc-harness`
+2. Descarga y compila DeepSeek Harness (versión congelada `dsh-v0.2.1-alpha.2`)
+3. Aplica la marca ENERSINC en la interfaz web
+4. Instala el servicio CREG local
+5. Crea perfiles `enersinc` (web) y `enersinc-cli` (headless) con CREG activo
+6. **Te pide tu llave DeepSeek** (empieza con `sk-`), **la escribe por ti en un archivo `.env` local** — no tienes que crear ni editar nada.
 
 ---
 
-<details>
-<summary><strong>Para el área técnica</strong> (arquitectura, variables, cómo se modificó la interfaz)</summary>
+## 💬 Uso diario
 
-### Qué es
-
-Un **DeepSeek Harness** congelado (ver [`dsh.lock`](dsh.lock), tag
-`dsh-v0.2.1-alpha.2`) más:
-
-- un **plugin de cliente** que pone el logo ENERSINC en la barra lateral
-  (`sidebar.brand.name`) sin tocar el núcleo del harness
-  ([`docs/BRANDING.md`](docs/BRANDING.md));
-- la capacidad **CREG** como bundle nativo (`creg_ask`, `creg_health`,
-  `creg_stats`) activa por defecto en los perfiles `enersinc` y `enersinc-cli`
-  ([`docs/CREG.md`](docs/CREG.md));
-- el servicio CREG local en `services/creg/` (Express + cliente, modo `direct`
-  sin Chromium).
-
-### Documentación
-
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — piezas y flujo de instalación.
-- [`docs/BRANDING.md`](docs/BRANDING.md) — cómo se integra el logo ENERSINC.
-- [`docs/CREG.md`](docs/CREG.md) — la capacidad CREG.
-
-### Estructura
-
-```
-install.cjs                     bootstrap universal (Node) — lo usa el comando único
-install.sh · install.ps1        equivalentes por shell (clon + setup.cjs)
-scripts/setup.cjs               TODO el setup en Node (marca, build, llave, CREG)
-scripts/setup.sh · setup-key.sh · setup-key.ps1   envoltorios de setup.cjs
-scripts/run.sh · web.sh         ejecución headless / interfaz web
-scripts/run.ps1 · web.ps1       equivalentes Windows
-scripts/doctor.sh               diagnóstico
-scripts/brand/apply.mjs         aplica el overlay de marca al checkout de dsh
-scripts/brand/gen-logo.mjs      regenera el componente del logo
-branding/dsh-client-ui-brand-enersinc/   plugin de marca (Web UI)
-packages/dsh-bundle-creg/       plugin nativo creg_*
-packages/mcp-creg/              puente MCP (opcional)
-services/creg/                  servicio CREG
-skills/uso-de-creg/             skill que orienta al modelo
-docs/                           arquitectura, marca, CREG
-```
-
-### Variables y configuración
-
-- La llave se guarda en `.env` (`DEEPSEEK_API_KEY`), que **no** se sube al repo
-  (está en `.gitignore`). La interfaz los esconde tras el prompt del instalador.
-- Sin interacción: `DEEPSEEK_API_KEY=sk-... ./scripts/setup.sh`.
-- Volver a pedir la llave: `ENERSINC_FORCE_KEY=1 ./scripts/setup.sh`.
-- CREG: `CREG_URL` (default `http://127.0.0.1:3100`), `CREG_MODE` (`direct` por
-  defecto).
-- Título de la pestaña: `DSH_CLIENT_TITLE` (default `ENERSINC Harness`).
-- Omitir la marca: `ENERSINC_SKIP_BRAND=1 ./scripts/setup.sh`.
-
-### Verificación
+### Abrir la interfaz web (estilo chat)
 
 ```bash
-bash scripts/ci-check.sh      # sintaxis, generador de logo y overlay idempotente
-./scripts/doctor.sh           # entorno, marca y CREG
+# macOS / Linux
+~/.enersinc-harness/scripts/web.sh
+
+# Windows (PowerShell)
+powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\.enersinc-harness\scripts\web.ps1
 ```
 
-### Licencia
+Se abre el navegador en `http://localhost:3000`. Verás el logo **🐳 DeepSeek Harness │ ENERSINC** en la barra superior.
 
-[MIT](LICENSE). El logo ENERSINC es marca de ENERSINC. "DeepSeek Harness" es
-marca de DeepSeek; este es un proyecto independiente de ENERSINC, no afiliado ni
-patrocinado por DeepSeek.
+### Pregunta única en terminal
 
-</details>
+```bash
+# macOS / Linux
+~/.enersinc-harness/scripts/run.sh "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"
+
+# Windows
+powershell -ExecutionPolicy Bypass -File $env:USERPROFILE\.enersinc-harness\scripts\run.ps1 "¿Qué es el cargo por confiabilidad?"
+```
+
+---
+
+## 🎯 Qué puedes preguntar
+
+El asistente consulta **exclusivamente** al asistente de IA oficial de la **CREG** (Comisión de Regulación de Energía y Gas de Colombia). No inventa respuestas.
+
+| Tema | Ejemplos |
+|------|----------|
+| **Confiabilidad** | "¿Qué es el Mecanismo de Sostenimiento de la Confiabilidad?"<br>"Explícame el cargo por confiabilidad y cómo se liquida" |
+| **Tarifas** | "¿Qué dice la CREG sobre tarifas residenciales?"<br>"¿Cómo se calcula la tarifa de opción regulada?" |
+| **Comercialización** | "Resume la última resolución sobre comercialización de energía"<br>"¿Qué requisitos pide la CREG para ser comercializador?" |
+| **Normativa general** | "¿Qué resoluciones de 2024 afectan a generadores?"<br>"Diferencia entre agente del mercado y usuario regulado" |
+
+> Si la CREG no tiene información sobre algo, el asistente te lo dice honestamente.
+
+---
+
+## 🔧 Comandos útiles
+
+| Acción | Comando |
+|--------|---------|
+| Cambiar/actualizar tu llave DeepSeek (te la pide y actualiza `.env`) | `~/.enersinc-harness/scripts/setup-key.sh` |
+| Diagnóstico completo (requisitos, build, marca, CREG) | `~/.enersinc-harness/scripts/doctor.sh` |
+| Ver logs del servicio CREG | `curl http://127.0.0.1:3100/health` |
+
+---
+
+## 🏗 Arquitectura (para el área técnica)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    ENERSINC Harness                         │
+├─────────────────────────────────────────────────────────────┤
+│  DeepSeek Harness (congelado)  │  Overlays ENERSINC         │
+│  vendor/deepseek-harness       │  • branding/ (plugin UI)   │
+│  tag: dsh-v0.2.1-alpha.2       │  • packages/dsh-bundle-creg│
+│  commit: d743267               │  • services/creg/ (Express)│
+└────────────────────────────────┴────────────────────────────┘
+```
+
+| Capa | Ubicación | Qué hace |
+|------|-----------|----------|
+| **Congelamiento** | `dsh.lock` | Fija tag + commit del harness probado |
+| **Marca UI** | `branding/` + `scripts/brand/` | Plugin cliente: logo ENERSINC en `sidebar.brand.name` |
+| **CREG nativo** | `packages/dsh-bundle-creg/` | Bundle Cordis: `creg_ask`, `creg_health`, `creg_stats` |
+| **Servicio CREG** | `services/creg/` | Express en `:3100`, modo `direct` (sin Chromium) |
+| **Skill** | `skills/uso-de-creg/` | Enseña al modelo cuándo y cómo usar las tools |
+| **Orquestación** | `install.cjs`, `scripts/setup.cjs` | Instalación multiplataforma en Node |
+
+### Perfiles creados
+
+| Perfil | Uso | CREG |
+|--------|-----|------|
+| `enersinc` | Interfaz web (`dsh web`) | Bundle nativo |
+| `enersinc-cli` | Headless / scripts | Bundle nativo |
+
+### Variables de entorno
+
+| Variable | Default | Descripción |
+|----------|---------|-------------|
+| `DEEPSEEK_API_KEY` | — | Llave del modelo (se guarda en `.env`) |
+| `CREG_URL` | `http://127.0.0.1:3100` | URL del servicio CREG |
+| `CREG_MODE` | `direct` | `direct` \| `auto` \| `browser` |
+| `DSH_CLIENT_TITLE` | `ENERSINC Harness` | Título de la pestaña del navegador |
+| `ENERSINC_SKIP_BRAND` | `0` | `1` = no aplicar marca |
+
+---
+
+## 📚 Documentación técnica
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — Piezas, flujo de instalación, determinismo
+- [`docs/BRANDING.md`](docs/BRANDING.md) — Cómo se integra el logo ENERSINC (slots de cliente)
+- [`docs/CREG.md`](docs/CREG.md) — Servicio, endpoints, modos, integración nativa y MCP
+- [`services/creg/README.md`](services/creg/README.md) — Cliente CREG standalone
+- [`skills/uso-de-creg/SKILL.md`](skills/uso-de-creg/SKILL.md) — Instrucciones para el modelo
+
+---
+
+## ✅ Verificación y CI
+
+```bash
+# Verificaciones locales (sintaxis, generador de logo, overlay idempotente)
+bash scripts/ci-check.sh
+
+# Diagnóstico del entorno instalado
+./scripts/doctor.sh
+```
+
+GitHub Actions ejecuta `ci-check.sh` en cada push a `main`.
+
+---
+
+## 🐛 Solución de problemas
+
+| Síntoma | Solución |
+|---------|----------|
+| `"no pude levantar el servicio CREG"` | Cierra y vuelve a abrir con `web.sh` / `run.sh` |
+| `"falta tu llave"` / no responde | Ejecuta `setup-key.sh` y pega tu llave `sk-...` |
+| Te cambió la llave | Ejecuta `setup-key.sh` con la nueva |
+| Cualquier otra cosa | Ejecuta `doctor.sh` y envía la salida a soporte |
+
+---
+
+## 📦 Requisitos del sistema
+
+| Componente | Mínimo | Nota |
+|------------|--------|------|
+| Node.js | ≥ 22 | LTS 24 recomendado |
+| Git | Cualquier versión | |
+| **Linux** | `build-essential` | Si falla la compilación: `sudo apt update && sudo apt install -y build-essential` |
+
+---
+
+## 📄 Licencia
+
+[MIT](LICENSE). El logo ENERSINC es marca de ENERSINC. "DeepSeek Harness" es marca de DeepSeek; este es un proyecto independiente de ENERSINC, no afiliado ni patrocinado por DeepSeek.
+
+---
+
+## 🔗 Enlaces
+
+- **ENERSINC** → [https://enersinc.com](https://enersinc.com)
+- **DeepSeek Harness** → [github.com/deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)
+- **CREG (regulador colombiano)** → [www.creg.gov.co](https://www.creg.gov.co)
