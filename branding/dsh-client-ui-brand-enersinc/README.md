@@ -52,7 +52,7 @@ export function apply(ctx) {
 ## The logo asset
 
 `src/client/EnersincLogo.tsx` inlines the ENERSINC mark as SVG paths
-(`viewBox 0 0 2560 472`). It was generated from `../../enersinc-logo.svg` with
+(`viewBox 0 0 2560 472`). It was generated from `../enersinc-logo.svg` with
 the C2PA metadata block and the full-canvas white backdrop removed, so it sits
 on both light and dark theme backgrounds. Regenerate it after editing the
 source SVG with `node ../../scripts/brand/gen-logo.mjs`.

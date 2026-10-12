@@ -6,6 +6,11 @@ Complementos del equipo para **[DeepSeek Harness](https://github.com/deepseek-ai
 > **Principio rector:** complementamos `dsh`; **nos adaptamos a él, no al revés.**
 > No tocamos su núcleo. Todo lo nuestro es plugin + skill + perfil.
 
+> **Nota:** este es el set secundario del equipo (plugin + skill sobre el servicio
+> `MONEDA/regulatorio`). El producto principal —harness congelado, marca ENERSINC
+> en la interfaz y CREG activa por defecto— está en el
+> [README raíz](../README.md).
+
 ## Capacidades
 
 | Capacidad | Servicio | Herramientas | Ruta de datos |

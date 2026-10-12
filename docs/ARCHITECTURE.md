@@ -29,7 +29,7 @@ por script).
 | CREG MCP | `packages/mcp-creg/` + `patches/` | puente MCP (alternativa) |
 | Servicio | `services/creg/` | Express + cliente CREG |
 | Skill | `skills/uso-de-creg/` | instrucciones para el modelo |
-| Orquestación | `scripts/setup.sh`, `install.sh`, `install.ps1` | instalan y configuran |
+| Orquestación | `install.cjs`, `scripts/setup.cjs` (+ `.sh` / `.ps1`) | instalan y configuran |
 
 ## Flujo de instalación
 

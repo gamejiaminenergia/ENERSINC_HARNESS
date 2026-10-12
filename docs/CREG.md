@@ -37,7 +37,8 @@ El bundle `packages/dsh-bundle-creg` registra tres herramientas Cordis:
 | `creg_health` | comprobar que el servicio responde |
 | `creg_stats` | métricas del servicio |
 
-`setup.sh`/`install.ps1` lo añaden a los perfiles `enersinc` y `enersinc-cli`:
+`scripts/setup.cjs` (el instalador) lo añade a los perfiles `enersinc` y
+`enersinc-cli`:
 
 ```bash
 pnpm dsh plugin --profile enersinc add ./packages/dsh-bundle-creg
@@ -58,7 +59,8 @@ de llamada es alto (300 s) porque `ask` puede tardar.
 ## Skill
 
 `skills/uso-de-creg/SKILL.md` enseña al modelo **cuándo** y **cómo** usar las
-herramientas (y qué no inventar). `setup.sh` copia `skills/` a
+herramientas (y qué no inventar). El instalador (`scripts/setup.cjs`) copia
+`skills/` a
 `$DSH_HOME/skills`.
 
 ## Variables

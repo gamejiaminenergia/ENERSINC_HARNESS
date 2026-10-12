@@ -3,6 +3,29 @@
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es/1.0.0/) y
 versionado [SemVer](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+### Añadido
+
+- **Comando de instalación universal** con Node.js, idéntico en Windows, macOS
+  y Linux (`node -e "…install.cjs…"`), más `install.sh` / `install.ps1` como
+  alternativas por shell.
+- `install.cjs` (bootstrap) y `scripts/setup.cjs`: **todo** el setup en Node,
+  una sola implementación para los tres sistemas.
+
+### Cambiado
+
+- El instalador **pide la llave** del modelo con un mensaje claro (entrada
+  oculta) en vez de pedir editar un archivo.
+- `setup.sh` / `setup-key.sh` / `setup-key.ps1` pasan a ser envoltorios de
+  `setup.cjs`.
+- README reescrito en lenguaje llano y con los **requisitos previos**
+  (Node.js y Git) explícitos.
+
+### Eliminado
+
+- `scripts/lib.sh` (su lógica vive ahora en `setup.cjs`).
+
 ## [0.1.0] - 2026-10-12
 
 Primera entrega pública.

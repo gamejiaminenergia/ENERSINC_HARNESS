@@ -173,13 +173,19 @@ Un **DeepSeek Harness** congelado (ver [`dsh.lock`](dsh.lock), tag
 - el servicio CREG local en `services/creg/` (Express + cliente, modo `direct`
   sin Chromium).
 
+### Documentación
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — piezas y flujo de instalación.
+- [`docs/BRANDING.md`](docs/BRANDING.md) — cómo se integra el logo ENERSINC.
+- [`docs/CREG.md`](docs/CREG.md) — la capacidad CREG.
+
 ### Estructura
 
 ```
 install.cjs                     bootstrap universal (Node) — lo usa el comando único
 install.sh · install.ps1        equivalentes por shell (clon + setup.cjs)
 scripts/setup.cjs               TODO el setup en Node (marca, build, llave, CREG)
-scripts/setup.sh · .ps1 · -key   envoltorios de setup.cjs
+scripts/setup.sh · setup-key.sh · setup-key.ps1   envoltorios de setup.cjs
 scripts/run.sh · web.sh         ejecución headless / interfaz web
 scripts/run.ps1 · web.ps1       equivalentes Windows
 scripts/doctor.sh               diagnóstico
